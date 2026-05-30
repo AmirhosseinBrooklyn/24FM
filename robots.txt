@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-brkloginyn/
+Disallow: /api/
+Disallow: /data/
+
+Sitemap: https://yourdomain.com/sitemap.xml

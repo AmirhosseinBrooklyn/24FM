@@ -1,0 +1,19 @@
+{
+  "name": "24FM — رادیو آنلاین ۲۴ ساعته",
+  "short_name": "24FM",
+  "description": "موسیقی بی‌وقفه، به سبک خودت",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2a1200",
+  "theme_color": "#c87020",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

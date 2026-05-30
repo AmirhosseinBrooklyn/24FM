@@ -1,0 +1,48 @@
+'use strict';
+
+(function () {
+  var API = '/api/track.php';
+
+  function send(data) {
+    try {
+      fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        keepalive: true,
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  send({ event: 'visit' });
+
+  /* Capture unhandled JS errors and forward to backend debug log */
+  window.addEventListener('error', function (e) {
+    send({
+      event:   'fe_error',
+      message: (e.message || 'unknown error').slice(0, 300),
+      source:  (e.filename || '').replace(/^.*\//, '').slice(0, 80)
+              + (e.lineno ? ':' + e.lineno : ''),
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function (e) {
+    send({
+      event:   'fe_error',
+      message: ('Unhandled promise: ' + (e.reason || '')).slice(0, 300),
+      source:  'promise',
+    });
+  });
+
+  window.Analytics = {
+    trackPlay: function (genreKey) {
+      send({ event: 'play', genre: String(genreKey).slice(0, 40) });
+    },
+    trackGenreSelect: function (genreKey) {
+      send({ event: 'genre_select', genre: String(genreKey).slice(0, 40) });
+    },
+    trackStop: function () {
+      send({ event: 'stop' });
+    },
+  };
+})();
