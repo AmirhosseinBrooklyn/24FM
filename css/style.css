@@ -71,19 +71,6 @@ body.popup-open { overflow: hidden; }
   background-size: 180px; mix-blend-mode: overlay;
 }
 
-.site-wrapper {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: space-between;
-  width: 100%; max-width: 520px;
-  
-  height: 100vh;
-  height: 100dvh;
-  
-  padding-top:    clamp(36px, 8vh, 80px);
-  padding-bottom: clamp(52px, 11vh, 100px);
-  padding-left: 24px; padding-right: 24px;
-}
-
 .hero { text-align: center; flex-shrink: 0; }
 
 .brand-name {
@@ -500,43 +487,23 @@ body.state-on .btn-play {
   background: rgba(175,38,18,0.2); border-color: rgba(175,38,18,0.46); color: #e06050;
 }
 
-@media (max-width: 370px) {
-  .gramophone { width: 94vw; }
-  .cd-wrap, .buffer-ring { left: 10px; width: 160px; height: 160px; }
-  .record { width: 160px; height: 160px; }
-  .record::before { width: 130px; height: 130px; }
-  .tone-arm { right: 34px; }
-  .genre-grid { gap: 8px; }
-  .genre-item { font-size: 0.79rem; padding: 10px 9px; }
-}
-
-@media (max-height: 620px) {
-  .brand-name   { font-size: clamp(1.9rem, 10vw, 2.8rem); }
-  .brand-tagline { font-size: 0.74rem; margin-top: 3px; }
-  .site-wrapper  {
-    padding-top:    clamp(14px, 3.5vh, 28px);
-    padding-bottom: clamp(12px, 3vh, 24px);
-  }
-  .gramophone  { height: clamp(188px, 52vw, 228px); }
-  .arm-shaft   { height: 185px; }
-}
-
-@media (min-width: 600px) and (min-height: 700px) {
-  .site-wrapper {
-    padding-top:    clamp(52px, 9vh, 100px);
-    padding-bottom: clamp(48px, 8vh, 88px);
-    max-width: 520px;
-  }
-  .brand-name     { font-size: clamp(4rem, 10vw, 5.2rem); }
-  .brand-tagline  { font-size: 1rem; margin-top: 8px; }
-  .footer-quote   { font-size: 0.82rem; }
-  .footer-credit  { font-size: 0.9rem; }
+.site-wrapper {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: space-between;
+  width: 100%; max-width: 520px;
+  
+  height: 100vh;
+  height: 100dvh;
+  
+  padding-top:    clamp(36px, 6vh, 80px);
+  padding-bottom: clamp(8px, 2vh, 16px);
+  padding-left: 24px; padding-right: 24px;
 }
 
 @media (min-width: 1024px) {
   .site-wrapper {
-    padding-top:    clamp(60px, 9vh, 108px);
-    padding-bottom: clamp(56px, 8vh, 96px);
+    padding-top:    clamp(60px, 8vh, 108px);
+    padding-bottom: clamp(8px, 2vh, 16px);
   }
   .gramophone {
     width: 440px;
@@ -549,11 +516,4 @@ body.state-on .btn-play {
   .label { width: 60px; height: 60px; }
   .tone-arm { right: 50px; }
   .arm-shaft { height: 230px; }
-}
-
-@media (min-width: 1440px) {
-  .site-wrapper {
-    padding-top:    100px;
-    padding-bottom:  88px;
-  }
 }
