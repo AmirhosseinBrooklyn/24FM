@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://24fm.ir/</loc>
-    <lastmod>2026-05-16</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://24fm.ir/assets/media/24fm-showcase.webp</image:loc>
+      <image:title>24FM رادیو آنلاین</image:title>
+      <image:caption>موسیقی بی‌وقفه، به سبک خودت</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Additional metadata for AI and search engines -->
+  <url>
+    <loc>https://24fm.ir/manifest.json</loc>
+    <lastmod>2026-06-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

@@ -1,7 +1,47 @@
-# robots.txt
+# 24FM Robots.txt
+# Sitemap
+Sitemap: https://24fm.ir/sitemap.xml
+
+# Allow all bots to index public content
 User-agent: *
-Disallow: 
+Allow: /
+Allow: /index.html
+Allow: /manifest.json
+Allow: /favicon.ico
+Allow: /banner.jpg
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+Allow: /robots.txt
+Allow: /sitemap.xml
+
+# Disallow private/admin areas
 Disallow: /admin-brkloginyn/
 Disallow: /api/
 Disallow: /data/
-Sitemap: https://24fm.ir/sitemap.xml
+
+# Crawl-delay and request-rate for all bots
+Crawl-delay: 1
+Request-rate: 30/60
+
+# Google Bot specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+Request-rate: 0
+
+# Bing Bot specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+Request-rate: 30/60
+
+# Bad bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Allow: /

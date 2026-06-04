@@ -1,19 +1,37 @@
 {
   "name": "24FM — رادیو آنلاین ۲۴ ساعته",
   "short_name": "24FM",
-  "description": "موسیقی بی‌وقفه، به سبک خودت",
+  "description": "موسیقی بی‌وقفه، به سبک خودت — رادیو آنلاین ۲۴ ساعته",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#2a1200",
   "theme_color": "#c87020",
   "lang": "fa",
   "dir": "rtl",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "any",
-      "type": "image/x-icon"
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/media/24fm-showcase.webp",
+      "sizes": "1200x630",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "screenshots": [
+    {
+      "src": "assets/media/24fm-showcase.webp",
+      "sizes": "1200x630",
+      "type": "image/webp",
+      "form_factor": "wide"
     }
   ]
 }
