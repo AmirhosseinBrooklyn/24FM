@@ -109,11 +109,20 @@
 
           <!-- Volume -->
           <div class="volume-wrap">
-            <svg class="vol-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
-              <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
-              <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
-            </svg>
+            <button class="vol-btn" id="vol-btn" aria-label="بی‌صدا / با صدا">
+              <!-- Normal volume icon -->
+              <svg class="vol-icon vol-icon-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                <path d="M15.54,8.46a5,5,0,0,1,0,7.07"/>
+                <path d="M19.07,4.93a10,10,0,0,1,0,14.14"/>
+              </svg>
+              <!-- Muted icon -->
+              <svg class="vol-icon vol-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                <line x1="22" y1="9" x2="16" y2="15"/>
+                <line x1="16" y1="9" x2="22" y2="15"/>
+              </svg>
+            </button>
             <input type="range" class="volume-slider" id="volume-slider"
                    min="0" max="1" step="0.05" value="1"
                    aria-label="میزان صدا">
@@ -123,7 +132,7 @@
 
       </div><!-- /gramophone -->
 
-      <!-- Error message — BELOW gramophone, not inside it -->
+      <!-- Error message -->
       <div class="stream-error" id="stream-error" aria-live="polite">
         خطا در اتصال به استریم | لطفاً دوباره تلاش کنید
       </div>
@@ -146,9 +155,11 @@
   <div class="popup-overlay" id="popup-overlay" aria-hidden="true">
     <div class="popup" id="popup" role="dialog" aria-modal="true" aria-label="انتخاب سبک موسیقی">
       <div class="popup-header">
-        <h2 class="popup-title">سبک موسیقی را انتخاب کنید</h2>
+        <h2 class="popup-title" id="popup-title">سبک موسیقی را انتخاب کنید</h2>
         <button class="popup-close" id="popup-close" aria-label="بستن">✕</button>
       </div>
+      <!-- Language selector / tabs — populated dynamically by popup.js -->
+      <div class="popup-lang-bar" id="popup-lang-bar"></div>
       <div class="genre-grid" id="genre-grid">
         <!-- Genres injected by popup.js -->
       </div>
