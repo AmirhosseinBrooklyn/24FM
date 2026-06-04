@@ -3,12 +3,11 @@
   # 📻 24FM | اف‌ام ۲۴
   **موسیقی بی‌وقفه، به سبک خودت — رادیو آنلاین ۲۴ ساعته**
 
-  ## **[ 24FM.ir ]**
+  ## **[24FM.ir](https://24fm.ir)**
 
   <div dir="ltr">
 
   [![Status](https://img.shields.io/badge/Status-Active-success.svg?style=for-the-badge)](#)
-  [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg?style=for-the-badge)](#)
   [![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange.svg?style=for-the-badge)](#)
   [![Backend](https://img.shields.io/badge/Backend-PHP%208.x-777BB4.svg?style=for-the-badge&logo=php&logoColor=white)](#)
   [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/agpl-3.0)
@@ -76,10 +75,15 @@
 
 ---
 
-## 👨‍💻 توسعه‌دهندگان اصلی
+## 👨‍💻 توسعه‌دهندگان
 
-توسعه یافته با عشق توسط:
-- [**AmirhosseinBrooklyn**](https://github.com/AmirhosseinBrooklyn)
-- [**HTTPS-CMD**](https://github.com/HTTPS-CMD)
+- 🗽 [**AmirhosseinBrooklyn**](https://github.com/AmirhosseinBrooklyn)
+- 🧑🏻‍💻 [**HTTPS-CMD**](https://github.com/HTTPS-CMD)
+
+</div>
+
+<div align="center">
+
+[ 🐛 [Found a bug? Let us know!](https://github.com/AmirhosseinBrooklyn/24FM/issues/new) ]
 
 </div>

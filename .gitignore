@@ -1,0 +1,73 @@
+# Sensitive & Admin Files
+admin-brkloginyn/
+data/
+js/popup.js
+
+# Logs & Debug Files
+*.log
+debug.log
+debug-log.php
+
+# Environment & Config
+.env
+.env.local
+.env.*.local
+
+# System & OS Files
+.DS_Store
+.AppleDouble/
+.LSOverride
+Thumbs.db
+.directory
+desktop.ini
+
+# IDE & Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.sublime-settings
+
+# Temporary & Backup Files
+*.tmp
+*.swp
+*.swo
+*~
+*.bak
+*.backup
+*.trash
+trash/
+
+# Dependencies & Build (future use)
+node_modules/
+dist/
+build/
+*.min.js
+
+# Package Managers
+package-lock.json
+yarn.lock
+composer.lock
+
+# OS Specific - macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.VolumeIcon.icns
+
+# OS Specific - Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# OS Specific - Linux
+.directory
+.cache/
+.local/
+.bash_history
+.Xauthority
