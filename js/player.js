@@ -114,6 +114,8 @@ var cdSwapLocked = false;
 function swapCD() {
   if (cdSwapLocked) return;
   cdSwapLocked = true;
+  // Keep the page-entry animation from restarting when the swap classes are removed.
+  cdWrap.style.animation = 'none';
   cdWrap.classList.remove('sliding-in', 'sliding-out');
   void cdWrap.offsetWidth;
   cdWrap.classList.add('sliding-out');

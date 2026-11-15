@@ -29,7 +29,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { height: 100%; overflow-x: hidden; }
-body { min-height: 100%; overflow: hidden; }
+body { min-height: 100%; overflow-x: clip; }
 
 body {
   font-family: 'Vazirmatn', 'Tahoma', sans-serif;
@@ -48,8 +48,8 @@ body.state-paused {
   background: radial-gradient(ellipse at 50% 65%, #1d1000 0%, #0e0600 72%);
 }
 body.state-paused .brand-name {
-  color: #8a5520;
-  text-shadow: none;
+  --brand-color: #8a5520;
+  --brand-glow: none;
 }
 body.state-paused .brand-tagline { color: var(--text-faint); }
 body.state-paused .track-info    { opacity: 0.35; }
@@ -74,15 +74,36 @@ body.popup-open { overflow: hidden; }
 .hero { text-align: center; flex-shrink: 0; }
 
 .brand-name {
+  --brand-color: var(--amber-bright);
+  --brand-glow: 0 0 50px rgba(240,144,80,0.32), 0 0 100px rgba(200,112,32,0.15);
   font-weight: 900;
   font-size: clamp(2.8rem, 14vw, 5.2rem);
   letter-spacing: -0.025em; line-height: 1;
-  color: var(--amber-bright);
-  text-shadow: 0 0 50px rgba(240,144,80,0.32), 0 0 100px rgba(200,112,32,0.15);
+  color: var(--brand-color);
+  text-shadow: var(--brand-glow);
   transition: text-shadow var(--t-power), color var(--t-power);
+  animation: brand-boot 1.25s steps(1, end) 1;
 }
 body.state-on .brand-name {
-  text-shadow: 0 0 35px rgba(240,144,80,0.72), 0 0 90px rgba(200,112,32,0.38), 0 2px 0 rgba(0,0,0,0.55);
+  --brand-glow: 0 0 35px rgba(240,144,80,0.72), 0 0 90px rgba(200,112,32,0.38), 0 2px 0 rgba(0,0,0,0.55);
+}
+
+/* Uneven, abrupt strikes of a tube starter, then the normal playback styling. */
+@keyframes brand-boot {
+  0%, 25%, 59% {
+    color: #6f5b4f;
+    opacity: 0.6;
+    text-shadow: none;
+  }
+  18%, 47%, 76%, 100% {
+    color: var(--brand-color);
+    opacity: 1;
+    text-shadow: var(--brand-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-name { animation: none; }
 }
 
 .brand-tagline {
@@ -123,9 +144,12 @@ body.state-paused .track-info { opacity: 0.35; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
 .gramophone {
+  /* Scale the mechanism from the desktop's 438px inner width, never the viewport. */
+  --deck-unit: calc(100cqw / 438);
+  container-type: inline-size;
   position: relative;
-  width:  clamp(300px, 88vw, 390px);
-  height: clamp(218px, 58vw, 260px);
+  width: min(100%, 390px);
+  aspect-ratio: 440 / 270;
   background: linear-gradient(152deg, #3d1f08 0%, #2b1400 52%, #1c0d00 100%);
   border-radius: 18px;
   border: 1.5px solid rgba(200,112,32,0.17);
@@ -145,8 +169,10 @@ body.state-on .gramophone {
 }
 
 .cd-wrap {
-  position: absolute; top: 17px; left: 16px;
-  width: 185px; height: 185px; overflow: visible;
+  position: absolute;
+  top: calc(18 * var(--deck-unit)); left: calc(18 * var(--deck-unit));
+  width: calc(200 * var(--deck-unit)); height: calc(200 * var(--deck-unit));
+  overflow: visible;
   
   animation: cd-intro 0.88s 0.2s cubic-bezier(0.22,1,0.36,1) both;
 }
@@ -169,7 +195,7 @@ body.state-on .gramophone {
 }
 
 .record {
-  width: 185px; height: 185px;
+  width: 100%; height: 100%;
   background: radial-gradient(circle at 36% 34%, #2e1e1e, #161010);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -180,33 +206,34 @@ body.state-on .gramophone {
 
 .record::before {
   content: ''; position: absolute;
-  width: 150px; height: 150px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.052);
-  box-shadow: 0 0 0 18px rgba(255,255,255,0.023), 0 0 0 35px rgba(255,255,255,0.013);
+  width: calc(165 * var(--deck-unit)); height: calc(165 * var(--deck-unit)); border-radius: 50%;
+  border: calc(1.5 * var(--deck-unit)) solid rgba(255,255,255,0.052);
+  box-shadow: 0 0 0 calc(18 * var(--deck-unit)) rgba(255,255,255,0.023),
+              0 0 0 calc(35 * var(--deck-unit)) rgba(255,255,255,0.013);
 }
 .record::after {
   content: ''; position: absolute;
-  width: 96px; height: 96px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.032);
+  width: calc(106 * var(--deck-unit)); height: calc(106 * var(--deck-unit)); border-radius: 50%;
+  border: var(--deck-unit) solid rgba(255,255,255,0.032);
 }
 
 .label {
-  width: 54px; height: 54px;
+  width: calc(60 * var(--deck-unit)); height: calc(60 * var(--deck-unit));
   background: radial-gradient(circle at 36% 32%, #d27828, #7c3900);
-  border-radius: 50%; border: 2px solid rgba(255,200,80,0.27);
+  border-radius: 50%; border: calc(2 * var(--deck-unit)) solid rgba(255,200,80,0.27);
   display: flex; align-items: center; justify-content: center;
   z-index: 2; position: relative;
-  box-shadow: 0 0 14px rgba(200,112,32,0.44);
+  box-shadow: 0 0 calc(14 * var(--deck-unit)) rgba(200,112,32,0.44);
 }
 .label::after {
   content: ''; position: absolute;
-  width: 9px; height: 9px; background: #070300;
-  border-radius: 50%; border: 1.5px solid rgba(255,175,55,0.27);
+  width: calc(9 * var(--deck-unit)); height: calc(9 * var(--deck-unit)); background: #070300;
+  border-radius: 50%; border: calc(1.5 * var(--deck-unit)) solid rgba(255,175,55,0.27);
 }
 .label-text {
-  font-size: 7.5px; font-weight: 900;
-  color: rgba(255,230,175,0.87); letter-spacing: 0.5px;
-  position: absolute; top: 10px;
+  font-size: calc(7.5 * var(--deck-unit)); font-weight: 900;
+  color: rgba(255,230,175,0.87); letter-spacing: calc(0.5 * var(--deck-unit));
+  position: absolute; top: calc(10 * var(--deck-unit));
 }
 
 .record.spinning { animation: spin 4s linear infinite; }
@@ -214,61 +241,63 @@ body.state-on .gramophone {
 
 .tone-arm {
   position: absolute;
-  top:   14px;
-  right: 44px;
-  width:  24px;
-  height: 24px;
-  transform-origin: 12px 12px;
+  top:   calc(14 * var(--deck-unit));
+  right: calc(50 * var(--deck-unit));
+  width:  calc(24 * var(--deck-unit));
+  height: calc(24 * var(--deck-unit));
+  transform-origin: 50% 50%;
   
-  transform: rotate(50deg);
+  transform: rotate(22deg);
   
   transition: transform 1.2s cubic-bezier(0.34, 1.06, 0.64, 1);
   z-index: 10;
 }
 
 .arm-pivot {
-  width: 24px; height: 24px;
+  width: 100%; height: 100%;
   background: radial-gradient(circle at 36% 32%, #686868, #1c1c1c);
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.18);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.08);
+  border: calc(2 * var(--deck-unit)) solid rgba(255,255,255,0.18);
+  box-shadow: 0 calc(2 * var(--deck-unit)) calc(10 * var(--deck-unit)) rgba(0,0,0,0.65),
+              inset 0 var(--deck-unit) 0 rgba(255,255,255,0.08);
   position: relative; z-index: 2;
 }
 
 .arm-shaft {
   position: absolute;
-  top: 10px; left: 50%;
+  top: calc(10 * var(--deck-unit)); left: 50%;
   transform: translateX(-50%);
   transform-origin: top center;
-  width: 5px; height: 210px;
+  width: calc(5 * var(--deck-unit)); height: calc(230 * var(--deck-unit));
   background: linear-gradient(180deg, #909090 0%, #e0e0e0 28%, #c8c8c8 62%, #888 100%);
-  border-radius: 2.5px 2.5px 1px 1px;
+  border-radius: calc(2.5 * var(--deck-unit)) calc(2.5 * var(--deck-unit)) var(--deck-unit) var(--deck-unit);
 }
 
 .arm-shaft::before {
   content: ''; position: absolute;
-  bottom: 2px; left: 50%;
+  bottom: calc(2 * var(--deck-unit)); left: 50%;
   transform: translateX(-50%) rotate(14deg);
   transform-origin: top center;
-  width: 4px; height: 40px;
+  width: calc(4 * var(--deck-unit)); height: calc(40 * var(--deck-unit));
   background: linear-gradient(180deg, #b8b8b8, #888, #626262);
-  border-radius: 2px;
+  border-radius: calc(2 * var(--deck-unit));
 }
 
 .arm-cartridge {
   position: absolute;
-  bottom: -13px; left: 50%;
+  bottom: calc(-13 * var(--deck-unit)); left: 50%;
   transform: translateX(-50%) rotate(14deg);
   transform-origin: top center;
-  width: 3px; height: 13px;
+  width: calc(3 * var(--deck-unit)); height: calc(13 * var(--deck-unit));
   background: linear-gradient(180deg, #787878, #444);
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 calc(2 * var(--deck-unit)) calc(2 * var(--deck-unit));
 }
 
 .buffer-ring {
-  position: absolute; top: 17px; left: 16px;
-  width: 185px; height: 185px; border-radius: 50%;
-  border: 3px solid rgba(224,128,48,0.15);
+  position: absolute;
+  top: calc(18 * var(--deck-unit)); left: calc(18 * var(--deck-unit));
+  width: calc(200 * var(--deck-unit)); height: calc(200 * var(--deck-unit)); border-radius: 50%;
+  border: calc(3 * var(--deck-unit)) solid rgba(224,128,48,0.15);
   border-top-color: var(--amber-warm);
   border-right-color: rgba(224,128,48,0.42);
   animation: spin 1s linear infinite;
@@ -285,7 +314,8 @@ body.state-on .gramophone {
   display: flex;
   align-items: flex-end;         
   justify-content: space-between;
-  padding: 0 18px 12px;          
+  /* Keep full-size controls clear of the parked arm on the narrowest cards. */
+  padding: 0 clamp(8px, calc(100cqw - 290px), 18px) 12px;
   background: linear-gradient(0deg, rgba(0,0,0,0.42) 0%, transparent 100%);
   border-radius: 0 0 18px 18px;
 }
@@ -355,10 +385,8 @@ body.state-on .btn-play {
 
 .stream-error {
   display: none;
-  position: absolute;
-  bottom: 0;                     
-  left: 50%; transform: translateX(-50%);
-  white-space: nowrap;
+  flex-shrink: 0;
+  overflow-wrap: anywhere;
   text-align: center;
   font-size: 0.77rem; color: #e07575;
   background: rgba(155,32,16,0.17);
@@ -492,8 +520,8 @@ body.state-on .btn-play {
   align-items: center; justify-content: space-between;
   width: 100%; max-width: 520px;
   
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   
   padding-top:    clamp(36px, 6vh, 80px);
   padding-bottom: clamp(8px, 2vh, 16px);
@@ -506,16 +534,19 @@ body.state-on .btn-play {
     padding-bottom: clamp(8px, 2vh, 16px);
   }
   .gramophone {
+    --deck-unit: 1px;
     width: 440px;
     height: 270px;
   }
-  .cd-wrap, .buffer-ring { width: 200px; height: 200px; top: 18px; left: 18px; }
-  .record { width: 200px; height: 200px; }
-  .record::before { width: 165px; height: 165px; }
-  .record::after  { width: 106px; height: 106px; }
-  .label { width: 60px; height: 60px; }
-  .tone-arm { right: 50px; }
-  .arm-shaft { height: 230px; }
+}
+
+@media (max-height: 600px) {
+  html { height: auto; overflow-y: auto; }
+  .site-wrapper {
+    gap: 24px;
+  }
+  .gramophone-section { flex: none; }
+  .site-footer { margin-top: 0; }
 }
 /* ═══════════════════════════════════════════════════════════════════════════
    Genre popup and saved-genre states
