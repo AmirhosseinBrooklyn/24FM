@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive launcher foreground: same gramophone artwork as the splash, scaled into the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.37"
+        android:scaleY="0.37"
+        android:translateX="0.72"
+        android:translateY="0.72">
+            <group
+               
+                android:pivotX="138"
+                android:pivotY="150">
+                <!-- Disc -->
+                <path
+                    android:fillColor="@color/fm_record"
+                    android:pathData="M64,150a74,74 0 1,0 148,0a74,74 0 1,0 -148,0" />
+                <path
+                    android:strokeColor="#40C87020"
+                    android:strokeWidth="1.5"
+                    android:pathData="M74,150a64,64 0 1,0 128,0a64,64 0 1,0 -128,0" />
+                <path
+                    android:strokeColor="#33C87020"
+                    android:strokeWidth="1.5"
+                    android:pathData="M84,150a54,54 0 1,0 108,0a54,54 0 1,0 -108,0" />
+                <path
+                    android:strokeColor="#2EC87020"
+                    android:strokeWidth="1.5"
+                    android:pathData="M94,150a44,44 0 1,0 88,0a44,44 0 1,0 -88,0" />
+                <!-- Light reflection that makes the rotation visible -->
+                <path
+                    android:strokeColor="#59E8D5A0"
+                    android:strokeLineCap="round"
+                    android:strokeWidth="3"
+                    android:pathData="M167,100A58,58 0 0,1 192,128" />
+                <!-- Label -->
+                <path
+                    android:fillColor="@color/fm_amber"
+                    android:pathData="M112,150a26,26 0 1,0 52,0a26,26 0 1,0 -52,0" />
+                <path
+                    android:strokeColor="@color/fm_amber_bright"
+                    android:strokeWidth="1.5"
+                    android:pathData="M118,150a20,20 0 1,0 40,0a20,20 0 1,0 -40,0" />
+                <path
+                    android:fillColor="@color/fm_cream"
+                    android:pathData="M135,133a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" />
+                <!-- Spindle -->
+                <path
+                    android:fillColor="@color/fm_bg_dark"
+                    android:pathData="M134,150a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+            </group>
+
+            <group
+               
+                android:pivotX="208"
+                android:pivotY="92"
+                android:rotation="0">
+                <path
+                    android:strokeColor="@color/fm_arm"
+                    android:strokeLineCap="round"
+                    android:strokeWidth="5"
+                    android:pathData="M208,92L178,165" />
+                <path
+                    android:strokeColor="#FFB0B0B0"
+                    android:strokeLineCap="round"
+                    android:strokeWidth="9"
+                    android:pathData="M179,162L174,175" />
+                <path
+                    android:fillColor="#FF8A8A8A"
+                    android:pathData="M199,92a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" />
+                <path
+                    android:fillColor="#FF4A4A4A"
+                    android:pathData="M204,92a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+            </group>
+    </group>
+</vector>

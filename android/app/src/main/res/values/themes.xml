@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.FM24" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/fm_amber</item>
+        <item name="colorOnPrimary">@color/fm_bg_dark</item>
+        <item name="colorSecondary">@color/fm_amber_bright</item>
+        <item name="colorSurface">@color/fm_bg</item>
+        <item name="colorOnSurface">@color/fm_cream</item>
+        <item name="android:colorBackground">@color/fm_bg_dark</item>
+        <item name="android:windowBackground">@color/fm_bg_dark</item>
+        <item name="android:fontFamily">@font/vazirmatn</item>
+        <item name="fontFamily">@font/vazirmatn</item>
+    </style>
+
+    <style name="Theme.FM24.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fm_bg_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_gramophone</item>
+        <item name="postSplashScreenTheme">@style/Theme.FM24</item>
+    </style>
+
+    <style name="TextAppearance.FM24.Banner" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/banner_text</item>
+        <item name="android:fontFamily">@font/vazirmatn</item>
+        <item name="fontFamily">@font/vazirmatn</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>

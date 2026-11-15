@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="banner_gap">16dp</dimen>
+    <!-- Keeps the status banner readable on tablets and in landscape instead of edge to edge. -->
+    <dimen name="banner_max_width">560dp</dimen>
+</resources>

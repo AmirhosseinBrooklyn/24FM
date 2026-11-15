@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>24FM</title>
+  <defs>
+    <radialGradient id="bg" cx="256" cy="294" r="358" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4a2000"/>
+      <stop offset="1" stop-color="#180900"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g transform="translate(-52.99 -52.99) scale(2.1458)">
+    <path d="M64,150a74,74 0 1,0 148,0a74,74 0 1,0 -148,0" fill="#140a04"/>
+    <path d="M74,150a64,64 0 1,0 128,0a64,64 0 1,0 -128,0" fill="none" stroke="#c87020" stroke-opacity="0.251" stroke-width="1.5"/>
+    <path d="M84,150a54,54 0 1,0 108,0a54,54 0 1,0 -108,0" fill="none" stroke="#c87020" stroke-opacity="0.2" stroke-width="1.5"/>
+    <path d="M94,150a44,44 0 1,0 88,0a44,44 0 1,0 -88,0" fill="none" stroke="#c87020" stroke-opacity="0.18" stroke-width="1.5"/>
+    <path d="M167,100A58,58 0 0,1 192,128" fill="none" stroke="#e8d5a0" stroke-opacity="0.349" stroke-width="3" stroke-linecap="round"/>
+    <path d="M112,150a26,26 0 1,0 52,0a26,26 0 1,0 -52,0" fill="#c87020"/>
+    <path d="M118,150a20,20 0 1,0 40,0a20,20 0 1,0 -40,0" fill="none" stroke="#f09050" stroke-width="1.5"/>
+    <path d="M135,133a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" fill="#e8d5a0"/>
+    <path d="M134,150a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="#180900"/>
+    <path d="M208,92L178,165" fill="none" stroke="#d9d9d9" stroke-width="5" stroke-linecap="round"/>
+    <path d="M179,162L174,175" fill="none" stroke="#b0b0b0" stroke-width="9" stroke-linecap="round"/>
+    <path d="M199,92a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" fill="#8a8a8a"/>
+    <path d="M204,92a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="#4a4a4a"/>
+  </g>
+</svg>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shown only when the site can't be displayed and there's no cached copy to fall back on. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fm_bg_dark"
+    android:clickable="true"
+    android:focusable="true"
+    android:layoutDirection="rtl">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="48dp">
+
+            <ImageView
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_gramophone" />
+
+            <TextView
+                android:id="@+id/error_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/err_offline_title"
+                android:textColor="@color/fm_amber_bright"
+                android:textDirection="rtl"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/error_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.3"
+                android:maxWidth="380dp"
+                android:text="@string/err_offline_body"
+                android:textColor="@color/fm_cream_dim"
+                android:textDirection="rtl"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/error_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:minWidth="160dp"
+                android:minHeight="52dp"
+                android:text="@string/action_retry"
+                android:textColor="@color/fm_bg_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/fm_amber"
+                app:cornerRadius="26dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Technical detail for support; deliberately small and quiet. -->
+    <TextView
+        android:id="@+id/error_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:alpha="0.55"
+        android:textColor="@color/fm_cream_dim"
+        android:textDirection="rtl"
+        android:textSize="11sp" />
+
+</FrameLayout>

@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-/* Only admin panel should call this — restrict referrer or use token */
+/* TODO: only the admin panel should read this; protect it with a token. */
 header('Content-Type: application/json');
 header('Cache-Control: no-store');
 

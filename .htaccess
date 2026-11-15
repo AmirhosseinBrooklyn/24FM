@@ -1,5 +1,5 @@
 # 24FM Apache Configuration
-# SEO, Performance, and Security Optimization
+# Redirects, compression, caching and security headers
 
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
@@ -20,7 +20,7 @@
   RewriteRule ^data/ - [F]
 </IfModule>
 
-# Enable GZIP compression for better SEO and performance
+# Compress text responses
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html
   AddOutputFilterByType DEFLATE text/plain
@@ -35,7 +35,7 @@
   AddOutputFilterByType DEFLATE application/json
 </IfModule>
 
-# Browser caching for better performance
+# How long browsers may keep each file type
 <IfModule mod_expires.c>
   ExpiresActive On
   
@@ -80,7 +80,7 @@
     Header set Cache-Control "max-age=31536000, public"
   </FilesMatch>
   
-  # Security headers for better SEO and protection
+  # Security headers
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "SAMEORIGIN"
   Header set X-XSS-Protection "1; mode=block"
@@ -88,7 +88,7 @@
   Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 </IfModule>
 
-# ETag for better caching
+# Let caches keep compressed and uncompressed copies apart
 <IfModule mod_headers.c>
   Header append Vary: Accept-Encoding
 </IfModule>

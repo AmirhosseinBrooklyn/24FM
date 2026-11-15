@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 7.1.1 and newer: HTTPS only, system CAs only. On Android 17 the platform also
+     enforces Certificate Transparency here; every 24FM and stream certificate carries SCTs. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

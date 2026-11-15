@@ -59,7 +59,7 @@
     }
   }
 
-  // Ensure correct initial body state
+  // Always start powered off; playback only begins on a tap.
   document.body.classList.add('state-off');
   document.body.classList.remove('state-on');
 })();

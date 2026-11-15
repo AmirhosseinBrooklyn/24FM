@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 7.0 (API 24) only; API 25+ uses xml-v25/network_security_config.xml.
+
+  24fm.ir and most stream servers use Let's Encrypt, whose ISRG roots only arrived in the
+  system store with Android 7.1.1. Without them every connection here fails, so the two
+  official roots (fingerprints checked against letsencrypt.org) are bundled as extra anchors.
+  Still HTTPS-only.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

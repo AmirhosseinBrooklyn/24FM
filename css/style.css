@@ -518,15 +518,15 @@ body.state-on .btn-play {
   .arm-shaft { height: 230px; }
 }
 /* ═══════════════════════════════════════════════════════════════════════════
-   NEW / UPDATED RULES — bug fixes & genre popup redesign
+   Genre popup and saved-genre states
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Track-info visibility with saved genre (no play required) ─────────── */
+/* ── Track info: shown as soon as a genre is remembered, even before play ─ */
 body.has-genre .track-info {
   opacity: 0.65;
   pointer-events: auto;
 }
-/* state-on overrides has-genre (full brightness) */
+/* While playing it goes to full brightness. */
 body.state-on .track-info {
   opacity: 1;
   pointer-events: auto;
@@ -554,7 +554,7 @@ body.state-on .track-info {
   50%      { opacity: 0.4; }
 }
 
-/* ── Vol button (replaces bare SVG icon) ───────────────────────────────── */
+/* ── Volume button ─────────────────────────────────────────────────────── */
 .vol-btn {
   background: none;
   border: none;
@@ -695,6 +695,6 @@ body.state-on .track-info {
   }
 }
 
-/* Cascade fix: state-paused must win over has-genre (both have same specificity;
-   source order determines the winner — this block comes last). */
+/* Paused must win over has-genre. Both selectors have the same specificity, so this
+   rule has to stay last in the file. */
 body.state-paused .track-info { opacity: 0.35; }

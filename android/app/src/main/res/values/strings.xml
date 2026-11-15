@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">24FM</string>
+    <string name="station_name">اف‌ام ۲۴</string>
+
+    <!-- Bottom banners: short and calm, never technical -->
+    <string name="net_no_internet">به اینترنت وصل نیستید</string>
+    <string name="net_dns">اینترنت ضعیف است؛ ارتباط با 24FM برقرار نشد</string>
+    <string name="net_timeout">اینترنت کند است؛ کمی صبر کنید یا دوباره امتحان کنید</string>
+    <string name="net_ssl">اتصال امن برقرار نشد</string>
+    <string name="net_server">ارتباط با 24FM موقتاً دچار اختلال شده است</string>
+    <string name="net_page_failed">صفحه کامل باز نشد</string>
+    <string name="net_stream_unavailable">پخش زنده موقتاً در دسترس نیست.</string>
+    <string name="net_degraded">کیفیت اتصال اینترنت پایین است</string>
+    <string name="net_retrying">در حال تلاش مجدد برای اتصال…</string>
+    <string name="net_restored">اتصال دوباره برقرار شد</string>
+    <string name="action_retry">تلاش دوباره</string>
+
+    <!-- Full-screen error, used only when there's no cached copy of the site -->
+    <string name="err_offline_title">به اینترنت وصل نیستید</string>
+    <string name="err_offline_body">وای‌فای یا اینترنت همراه را بررسی کنید. به محض وصل شدن، 24FM خودش دوباره باز می‌شود.</string>
+    <string name="err_weak_title">اینترنت ضعیف یا ناپایدار است</string>
+    <string name="err_weak_body">ارتباط با 24FM برقرار نشد. معمولاً با کمی صبر یا یک بار امتحان دوباره درست می‌شود.</string>
+    <string name="err_server_title">24FM موقتاً در دسترس نیست</string>
+    <string name="err_server_body">سایت کمی شلوغ است یا در حال به‌روزرسانی است. چند لحظه دیگر دوباره امتحان کنید.</string>
+    <string name="err_secure_title">اتصال امن برقرار نشد</string>
+    <string name="err_secure_body">تاریخ و ساعت گوشی را بررسی کنید یا با یک شبکهٔ دیگر امتحان کنید.</string>
+    <string name="err_page_title">صفحه کامل باز نشد</string>
+    <string name="err_page_body">یک بار دیگر امتحان کنید. اگر درست نشد، کمی بعد سر بزنید.</string>
+    <string name="err_code">کد خطا: %1$s</string>
+
+    <!-- Country notice -->
+    <string name="vpn_notice">برای عملکرد بهتر و پخش بی‌وقفه، پیشنهاد می‌کنیم فیلترشکن خود را خاموش کنید!</string>
+
+    <!-- Back navigation -->
+    <string name="press_back_again">برای خروج، یک‌بار دیگر دکمه بازگشت را بزنید.</string>
+
+    <!-- Links -->
+    <string name="no_app_for_link">برنامه‌ای برای باز کردن این لینک پیدا نشد</string>
+    <string name="link_blocked">این لینک به دلایل امنیتی باز نمی‌شود</string>
+
+    <!-- Accessibility -->
+    <string name="cd_web_content">محتوای رادیو 24FM</string>
+    <string name="cd_loading">در حال بارگذاری</string>
+
+    <!-- Playback -->
+    <string name="playback_live">پخش زنده</string>
+    <string name="playback_default_genre">رادیو آنلاین ۲۴ ساعته</string>
+    <string name="notification_channel_name">پخش رادیو</string>
+</resources>

@@ -1,0 +1,34 @@
+# Build outputs and caches
+.gradle/
+.kotlin/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.idsig
+*.ap_
+*.dex
+
+# IDE and OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Secrets and machine-specific settings (kept locally, never committed)
+local.properties
+keystore.properties
+keystore/
+*.jks
+*.keystore
+*.p12
+*.pem.key
+google-services.json
+*service-account*.json
+*-api-key*
+secrets.properties
+
+# Store deliverables are packaged into the release zip instead of the repo
+deliverables/

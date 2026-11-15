@@ -55,8 +55,33 @@
 | **Streaming Core** | `hls.js` | Advanced adaptive bitrate streaming, handling audio chunks and network buffering with precision. |
 | **Backend API** | `PHP 8.x (Strict Types)` | High-performance, securely typed RESTful endpoints managing active sessions and telemetry. |
 | **Storage Engine** | `File-based System` | Ultra-fast, zero-configuration `.jsonl` and `.sess` flat-file storage, eliminating SQL overhead and optimizing read/write speeds. |
+| **Android App** | `Kotlin`, `Media3`, `WebView` | Native background playback through a `MediaSessionService`, a hardened WebView for the site, and separate Cafe Bazaar and Myket flavors. |
 
 <div dir="rtl">
+
+---
+
+## 📱 اپلیکیشن اندروید
+
+نسخهٔ اندروید 24FM (نسخهٔ **1.0.0**، شناسهٔ بسته `ir.fm24.app`) در پوشهٔ [`android/`](android/) قرار دارد. اپ همین سایت را در یک WebView امن نمایش می‌دهد، اما پخش صدا را به یک سرویس نیتیو می‌سپارد. به این ترتیب رادیو با خاموش شدن صفحه، روی صفحهٔ قفل و حتی بعد از بستن اپ ادامه پیدا می‌کند.
+
+- 🎧 **پخش نیتیو در پس‌زمینه:** پخش با Media3/ExoPlayer، با اعلان رسانه و کنترل از صفحهٔ قفل، هدست و بلوتوث. تمرکز صدا (Audio Focus) و اتصال مجدد هم مدیریت می‌شوند و هیچ‌وقت دو صدا هم‌زمان پخش نمی‌شود.
+- 💿 **صفحهٔ بارگذاری گرامافونی:** صفحهٔ گرامافون تا پایان کامل بارگذاری سایت می‌چرخد و بعد با یک حرکت نرم کنار می‌رود.
+- 🗂️ **کش هوشمند:** پیش از هر بارگذاری، تغییرات سایت با درخواست‌های سبک HEAD بررسی می‌شود. اگر سایت تغییری نکرده باشد، نسخهٔ ذخیره‌شده فوراً باز می‌شود. اگر تغییر کرده باشد، کش پاک و نسخهٔ جدید جایگزین می‌شود. وقتی اینترنت قطع یا ضعیف است، آخرین نسخهٔ ذخیره‌شده نمایش داده می‌شود. کوکی‌ها و تنظیمات کاربر هرگز پاک نمی‌شوند.
+- 💬 **پیام‌های خطای دوستانه:** پیام‌های کوتاه و آرام فارسی با دکمهٔ «تلاش دوباره»، و کد فنی خطا با نوشتهٔ کوچک.
+- 🏪 **نسخهٔ جدا برای هر استور:** دو flavor با نام‌های `bazaar` (کافه‌بازار) و `myket` (مایکت)، با کد مشترک در یک جا و پوشهٔ اختصاصی برای هر استور.
+- 📐 **سازگار با همهٔ صفحه‌ها:** از گوشی در حالت عمودی و افقی تا تبلت، تاشوها و تقسیم صفحه، با رعایت کامل لبه‌به‌لبه (Edge-to-Edge).
+
+### تنظیمات SDK
+
+| مورد | مقدار |
+| --- | --- |
+| minSdk | 24 (اندروید 7.0) |
+| targetSdk | 37 (اندروید 17) |
+| compileSdk | 37 |
+| Android Gradle Plugin / Gradle / Kotlin | 9.5.1 / 9.9.1 / 2.4.21 |
+
+مایکت از ۱ آبان ۱۴۰۵ انتشار برنامه یا به‌روزرسانی با Target SDK کمتر از ۳۴ را نمی‌پذیرد، و گوگل‌پلی هم از ۳۱ اوت ۲۰۲۶ حداقل سطح ۳۶ را الزامی کرده است. هدف‌گیری سطح ۳۷، یعنی آخرین نسخهٔ پایدار اندروید، هر دو استور را با فاصلهٔ کافی پوشش می‌دهد. راهنمای ساخت، امضا و جزئیات فنی در [`android/README.md`](android/README.md) آمده است.
 
 ---
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand palette taken from https://24fm.ir css/style.css -->
+    <color name="fm_amber">#FFC87020</color>
+    <color name="fm_amber_bright">#FFF09050</color>
+    <color name="fm_cream">#FFE8D5A0</color>
+    <color name="fm_cream_dim">#FFC4A870</color>
+    <color name="fm_bg_dark">#FF180900</color>
+    <color name="fm_bg">#FF1F0C00</color>
+    <color name="fm_bg_light">#FF2D1600</color>
+    <color name="fm_record">#FF140A04</color>
+    <color name="fm_arm">#FFD9D9D9</color>
+
+    <!-- Status banner severities -->
+    <color name="banner_error">#FFB3261E</color>
+    <color name="banner_warning">#FFC2410C</color>
+    <color name="banner_info">#FF1D4ED8</color>
+    <color name="banner_stream">#FF7E22CE</color>
+    <color name="banner_degraded">#FFA16207</color>
+    <color name="banner_success">#FF15803D</color>
+    <color name="banner_text">#FFFFFFFF</color>
+</resources>

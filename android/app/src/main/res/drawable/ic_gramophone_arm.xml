@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tone arm only; sits over the spinning record.
+     Drawn on the same 288-unit canvas as the splash icon so the two line up exactly. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+            <group
+                android:pivotX="208"
+                android:pivotY="92"
+                android:rotation="0">
+                <path
+                    android:strokeColor="@color/fm_arm"
+                    android:strokeLineCap="round"
+                    android:strokeWidth="5"
+                    android:pathData="M208,92L178,165" />
+                <path
+                    android:strokeColor="#FFB0B0B0"
+                    android:strokeLineCap="round"
+                    android:strokeWidth="9"
+                    android:pathData="M179,162L174,175" />
+                <path
+                    android:fillColor="#FF8A8A8A"
+                    android:pathData="M199,92a9,9 0 1,0 18,0a9,9 0 1,0 -18,0" />
+                <path
+                    android:fillColor="#FF4A4A4A"
+                    android:pathData="M204,92a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+            </group>
+</vector>

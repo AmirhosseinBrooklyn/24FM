@@ -16,7 +16,7 @@
 
   send({ event: 'visit' });
 
-  /* Capture unhandled JS errors and forward to backend debug log */
+  /* Send unhandled errors to the server log so we hear about bugs users hit. */
   window.addEventListener('error', function (e) {
     send({
       event:   'fe_error',

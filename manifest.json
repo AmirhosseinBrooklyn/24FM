@@ -13,16 +13,28 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "assets/icons/icon.svg",
       "sizes": "any",
-      "type": "image/x-icon",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "assets/media/24fm-showcase.webp",
-      "sizes": "1200x630",
-      "type": "image/webp",
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["music", "entertainment"],
