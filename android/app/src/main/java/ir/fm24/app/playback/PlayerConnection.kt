@@ -83,6 +83,9 @@ class PlayerConnection(context: Context) {
 
     fun play(station: Station) = withController { c ->
         val sameStation = c.mediaItemCount > 0 && c.currentMediaItem?.mediaId == station.url
+        if (sameStation && c.currentMediaItem?.mediaMetadata?.station?.toString() != station.label) {
+            c.replaceMediaItem(0, stations.build(station))
+        }
         val active = c.playWhenReady && c.playbackState != Player.STATE_IDLE && c.playerError == null
         when {
             sameStation && (active || isRetrying(c)) -> Unit // already playing or reconnecting
@@ -128,9 +131,8 @@ class PlayerConnection(context: Context) {
             !c.playWhenReady -> BridgeState.PAUSED
             c.playbackState == Player.STATE_BUFFERING -> BridgeState.BUFFERING
             c.playbackState == Player.STATE_IDLE -> BridgeState.BUFFERING
-            // READY covers transient focus loss (phone call): still "playing" from the
-            // user's point of view, so the page must not flip to paused.
-            else -> BridgeState.PLAYING
+            c.isPlaying -> BridgeState.PLAYING
+            else -> BridgeState.PAUSED
         }
         val item = c.currentMediaItem
         _snapshot.value = PlaybackSnapshot(

@@ -1,33 +1,27 @@
 <?php
-/* ============================================================
-   api/live-users.php — Active user count (session-based)
-   ============================================================ */
-
 declare(strict_types=1);
-
-/* TODO: only the admin panel should read this; protect it with a token. */
-header('Content-Type: application/json');
+require_once __DIR__ . '/activity-store.php';
+header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
-
-/* Session heartbeat: each visitor pings every 30s; expire after 90s */
-$sessions_dir = sys_get_temp_dir() . '/24fm_sessions';
-if (!is_dir($sessions_dir)) mkdir($sessions_dir, 0700, true);
-
-/* Clean up stale sessions (older than 90 seconds) */
-$now = time();
-foreach (glob($sessions_dir . '/*.sess') ?: [] as $f) {
-    if (($now - filemtime($f)) > 90) @unlink($f);
+try {
+    $method = $_SERVER['REQUEST_METHOD'];
+    if ($method === 'GET') {
+        echo json_encode(fm_activity(), JSON_THROW_ON_ERROR);
+    } elseif ($method === 'POST') {
+        if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 4096) { http_response_code(413); exit; }
+        $data = json_decode(file_get_contents('php://input', false, null, 0, 4097), true);
+        if (!is_array($data) || !is_string($data['client_id'] ?? null) || !is_string($data['attempt_id'] ?? '') || !preg_match('/^[A-Za-z0-9_-]{16,100}$/D', (string)($data['client_id'] ?? '')) ||
+            !isset($data['sequence']) || !is_int($data['sequence']) || $data['sequence'] < 0 ||
+            !in_array($data['state'] ?? '', ['off', 'connecting', 'live'], true) ||
+            !in_array($data['source'] ?? 'web', ['web', 'android'], true) ||
+            !preg_match('/^[A-Za-z0-9_-]{0,100}$/D', (string)($data['attempt_id'] ?? '')) ||
+            !is_string($data['genre'] ?? '') || strlen($data['genre'] ?? '') > 200 ||
+            !is_string($data['genre_label'] ?? '') || strlen($data['genre_label'] ?? '') > 240) {
+            http_response_code(400); echo '{"error":"invalid_activity"}'; exit;
+        }
+        echo json_encode(fm_activity($data, null, ($data['source'] ?? 'web') === 'android' ? hash('sha256', $data['client_id']) : fm_tracker_id()), JSON_THROW_ON_ERROR);
+    } else { header('Allow: GET, POST'); http_response_code(405); }
+} catch (Throwable $e) {
+    error_log('24FM activity: ' . $e->getMessage());
+    http_response_code(503); echo '{"error":"unavailable"}';
 }
-
-/* Touch this session's heartbeat file */
-$session_id = session_id() ?: (isset($_COOKIE['PHPSESSID']) ? preg_replace('/[^a-zA-Z0-9]/', '', $_COOKIE['PHPSESSID']) : '');
-if ($session_id) {
-    $sess_file = $sessions_dir . '/' . $session_id . '.sess';
-    touch($sess_file);
-}
-
-/* Count active sessions */
-$count = count(glob($sessions_dir . '/*.sess') ?: []);
-
-echo json_encode(['live_users' => $count]);
-exit;

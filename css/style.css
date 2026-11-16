@@ -47,12 +47,8 @@ body.state-on {
 body.state-paused {
   background: radial-gradient(ellipse at 50% 65%, #1d1000 0%, #0e0600 72%);
 }
-body.state-paused .brand-name {
-  --brand-color: #8a5520;
-  --brand-glow: none;
-}
 body.state-paused .brand-tagline { color: var(--text-faint); }
-body.state-paused .track-info    { opacity: 0.35; }
+
 body.state-paused .gramophone {
   border-color: rgba(200,112,32,0.12);
   box-shadow: 0 6px 0 #0c0500, 0 12px 45px rgba(0,0,0,0.94);
@@ -73,38 +69,7 @@ body.popup-open { overflow: hidden; }
 
 .hero { text-align: center; flex-shrink: 0; }
 
-.brand-name {
-  --brand-color: var(--amber-bright);
-  --brand-glow: 0 0 50px rgba(240,144,80,0.32), 0 0 100px rgba(200,112,32,0.15);
-  font-weight: 900;
-  font-size: clamp(2.8rem, 14vw, 5.2rem);
-  letter-spacing: -0.025em; line-height: 1;
-  color: var(--brand-color);
-  text-shadow: var(--brand-glow);
-  transition: text-shadow var(--t-power), color var(--t-power);
-  animation: brand-boot 1.25s steps(1, end) 1;
-}
-body.state-on .brand-name {
-  --brand-glow: 0 0 35px rgba(240,144,80,0.72), 0 0 90px rgba(200,112,32,0.38), 0 2px 0 rgba(0,0,0,0.55);
-}
-
-/* Uneven, abrupt strikes of a tube starter, then the normal playback styling. */
-@keyframes brand-boot {
-  0%, 25%, 59% {
-    color: #6f5b4f;
-    opacity: 0.6;
-    text-shadow: none;
-  }
-  18%, 47%, 76%, 100% {
-    color: var(--brand-color);
-    opacity: 1;
-    text-shadow: var(--brand-glow);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brand-name { animation: none; }
-}
+.brand-name { font-size: clamp(2.8rem, 14vw, 5.2rem); line-height: 1; }
 
 .brand-tagline {
   margin-top: 7px;
@@ -128,11 +93,11 @@ body.state-on .brand-tagline { color: var(--cream-dim); }
   font-size: 0.73rem; font-weight: 700;
   color: var(--amber-warm);
   letter-spacing: 0.055em;
-  opacity: 0; pointer-events: none;
+  opacity: 1;
   transition: opacity var(--t-power);
 }
-body.state-on    .track-info { opacity: 1; }
-body.state-paused .track-info { opacity: 0.35; }
+
+
 
 .track-dot { font-size: 0.42rem; animation: blink 2s ease-in-out infinite; }
 .track-live {
@@ -494,26 +459,9 @@ body.state-on .btn-play {
 }
 .genre-item .emoji { font-size: 1.1rem; flex-shrink: 0; }
 
-.genre-item.anim-from-right { animation: slide-right 0.35s ease-out forwards; }
-.genre-item.anim-from-left  { animation: slide-left  0.35s ease-out forwards; }
-@keyframes slide-right { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
-@keyframes slide-left  { from{opacity:0;transform:translateX(-36px)} to{opacity:1;transform:translateX(0)} }
-
-.popup-poweroff {
-  border-top: 1px solid rgba(200,112,32,0.1); padding-top: 14px;
-  display: flex; justify-content: center;
-}
-.btn-poweroff {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(175,38,18,0.09);
-  border: 1px solid rgba(175,38,18,0.27); color: #c05040;
-  font-family: 'Vazirmatn', sans-serif; font-size: 0.83rem; font-weight: 700;
-  padding: 9px 24px; border-radius: 30px; cursor: pointer; letter-spacing: 0.04em;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-}
-.btn-poweroff:hover {
-  background: rgba(175,38,18,0.2); border-color: rgba(175,38,18,0.46); color: #e06050;
-}
+.genre-item.appearing { animation: genre-appear .35s ease-out both; }
+@keyframes genre-appear { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .genre-item.appearing { animation: none; opacity: 1; } }
 
 .site-wrapper {
   display: flex; flex-direction: column;
@@ -552,16 +500,7 @@ body.state-on .btn-play {
    Genre popup and saved-genre states
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Track info: shown as soon as a genre is remembered, even before play ─ */
-body.has-genre .track-info {
-  opacity: 0.65;
-  pointer-events: auto;
-}
-/* While playing it goes to full brightness. */
-body.state-on .track-info {
-  opacity: 1;
-  pointer-events: auto;
-}
+
 
 /* ── Connecting message ────────────────────────────────────────────────── */
 .connecting-msg {
@@ -726,6 +665,86 @@ body.state-on .track-info {
   }
 }
 
-/* Paused must win over has-genre. Both selectors have the same specificity, so this
-   rule has to stay last in the file. */
-body.state-paused .track-info { opacity: 0.35; }
+
+
+/* Observed listener activity and connection feedback. */
+.listener-count {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  max-width: 100%; padding: 8px 16px; border-radius: 999px;
+  border: 1px solid rgba(200,112,32,.23); background: rgba(25,12,2,.65);
+  color: var(--cream-dim); font-size: .78rem; line-height: 1.7; text-align: center;
+}
+.listener-count b { color: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; }
+.listener-orb { position: relative; width: 7px; height: 7px; border-radius: 50%; background: #88dfac; flex-shrink: 0; }
+.listener-orb::after { content: ''; position: absolute; inset: -3px; border-radius: inherit;
+  background: rgba(100,215,145,.25); animation: listener-pulse 2.8s ease-in-out infinite; }
+@keyframes listener-pulse { 0%,100% { transform: scale(.8); opacity: .35; } 50% { transform: scale(1.25); opacity: .8; } }
+.listener-count.unavailable .listener-orb { background: var(--dust); }
+.listener-count.unavailable .listener-orb::after { animation: none; opacity: 0; }
+.track-info { max-width: 100%; flex-wrap: wrap; justify-content: center; }
+.track-live { color: #ffc0b5; background: rgba(150,45,35,.24); border-color: rgba(255,150,130,.35); }
+.track-dot { color: #ffc0b5; animation: none; }
+body[data-connection="live"] .track-live { color: #9ce7b5; background: rgba(35,120,65,.24); border-color: rgba(100,215,145,.36); }
+body[data-connection="live"] .track-dot { color: #9ce7b5; animation: blink 2s ease-in-out infinite; }
+body[data-connection="connecting"] .track-live { color: var(--amber-bright); background: rgba(240,144,80,.12); border-color: rgba(240,144,80,.35); }
+body[data-connection="connecting"] .track-dot { color: var(--amber-bright); animation: blink 1.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .listener-orb::after, body .track-dot { animation: none !important; } }
+
+/* A searchable station grid with independently scrolling options. */
+[hidden] { display: none !important; }
+.popup { width: min(96vw, 620px); display: flex; flex-direction: column; overflow: hidden; max-height: 90vh; max-height: 90dvh; }
+.popup-header, .popup-lang-bar, .genre-search-wrap { flex-shrink: 0; }
+.genre-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 3px; scrollbar-width: thin; }
+.genre-item { min-width: 0; text-align: right; line-height: 1.65; }
+.genre-item > span:last-child { overflow-wrap: anywhere; }
+.genre-search-wrap { display: grid; grid-template-columns: 1fr auto; gap: 5px 8px; margin: 0 3px 12px; }
+.genre-search-wrap label { grid-column: 1 / -1; color: var(--cream-dim); font-size: .76rem; }
+.genre-search-wrap input { width: 100%; min-width: 0; background: rgba(0,0,0,.25); color: var(--cream); border: 1px solid rgba(200,112,32,.28); border-radius: 10px; padding: 8px 12px; font: inherit; font-size: .83rem; outline-offset: 2px; }
+.genre-search-wrap input:focus-visible { outline: 2px solid var(--amber-warm); }
+/* The field has its own clear button; hide the browser's built-in one so only one × shows. */
+.genre-search-wrap input::-webkit-search-cancel-button, .genre-search-wrap input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
+.genre-search-wrap button { width: 38px; border-radius: 10px; border: 1px solid rgba(200,112,32,.28); color: var(--cream-dim); background: rgba(200,112,32,.08); font-size: 1.3rem; cursor: pointer; }
+.genre-empty { grid-column: 1 / -1; padding: 20px 8px; text-align: center; color: var(--cream-dim); font-size: .83rem; }
+@media (min-width: 600px) { .genre-grid:not(.lang-step) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-height: 600px) {
+  .popup { padding: 12px; }
+  .popup-header { margin-bottom: 6px; padding-bottom: 4px; }
+  .lang-tabs { padding-bottom: 6px; margin-bottom: 0; }
+  .lang-tab { padding: 6px 8px; }
+  .genre-search-wrap { margin-bottom: 8px; }
+  .genre-search-wrap label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .genre-search-wrap input { padding: 6px 10px; }
+  .genre-grid { margin-bottom: 8px; }
+}
+
+/* Letter cores and their synchronized halo copies share each animation's timing.
+   .is-striking = the one-time intro; .is-tired = the category-change flicker. */
+@property --lit { syntax: '<number>'; inherits: false; initial-value: 1; }
+:root {
+  --fluo-fg: #f09050;
+  --fluo-dim: #8a5520;
+  --fluo-glow: #f09050;
+  --fluo-shadow: 0 0 3px var(--fluo-fg), 0 0 9px var(--fluo-glow), 0 0 22px color-mix(in srgb, var(--fluo-glow) 75%, transparent), 0 0 38px color-mix(in srgb, var(--fluo-glow) 45%, transparent);
+}
+.fluo { position: relative; display: inline-block; direction: ltr; font-weight: 900; letter-spacing: .06em; white-space: nowrap; }
+.fluo .s, .fluo .g { display: block; }
+.fluo .g { position: absolute; inset: 0; color: var(--fluo-fg); text-shadow: var(--fluo-shadow); pointer-events: none; }
+.fluo .l { display: inline-block; --lit: 1; }
+.fluo.is-striking .l { animation: fluo-start var(--d, 3s) steps(1, end) var(--dl, 0s) both; }
+.fluo .l.is-tired { animation: fluo-tired var(--td, 8s) steps(1, end) var(--tdl, 0s); }
+.fluo .s .l { color: color-mix(in srgb, var(--fluo-fg) calc(var(--lit) * 100%), var(--fluo-dim)); }
+.fluo .g .l { opacity: var(--lit); }
+@keyframes fluo-start {
+  0% { --lit: 0 } 9% { --lit: 1 } 11% { --lit: 0 }
+  25% { --lit: 1 } 27% { --lit: 0 } 30% { --lit: 1 } 34% { --lit: 0 }
+  41% { --lit: 1 } 43% { --lit: 0 } 50%, 100% { --lit: 1 }
+}
+/* Tired-tube flicker, played once per successful genre change: three short dropouts late in the cycle. */
+@keyframes fluo-tired {
+  0% { --lit: 1 } 80% { --lit: 0 } 81% { --lit: 1 } 83% { --lit: 0 }
+  84% { --lit: 1 } 86% { --lit: 0 } 90%, 100% { --lit: 1 }
+}
+@media (prefers-reduced-motion: reduce) { .fluo .l, .fluo.is-striking .l, .fluo .l.is-tired { animation: none; --lit: 1; } }
+.fluo.is-off .l { animation: none; --lit: 0; }
+/* Keep the fallback text dim even before the DOM is built. */
+.fluo.is-off { color: var(--fluo-dim); text-shadow: none; }

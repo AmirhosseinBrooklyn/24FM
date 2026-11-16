@@ -358,7 +358,7 @@ class MainActivity : AppCompatActivity(), FmWebViewClient.Callbacks {
     private fun onBridgeMessage(message: BridgeMessage) {
         when (message) {
             BridgeMessage.Hello -> bridge?.push(player.snapshot.value)
-            is BridgeMessage.Play -> player.play(Station(message.url, message.label))
+            is BridgeMessage.Play -> player.play(Station(message.url, message.label, message.genreKey))
             BridgeMessage.Pause -> player.pause()
             BridgeMessage.Stop -> player.stop()
             is BridgeMessage.Volume -> player.setVolume(message.value)

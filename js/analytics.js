@@ -5,7 +5,7 @@
 
   function send(data) {
     try {
-      fetch(API, {
+      return fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -14,7 +14,7 @@
     } catch (e) {}
   }
 
-  send({ event: 'visit' });
+  var ready = send({ event: 'visit' });
 
   /* Send unhandled errors to the server log so we hear about bugs users hit. */
   window.addEventListener('error', function (e) {
@@ -35,14 +35,12 @@
   });
 
   window.Analytics = {
+    ready: ready,
     trackPlay: function (genreKey) {
-      send({ event: 'play', genre: String(genreKey).slice(0, 40) });
+      // Successful plays are confirmed by the presence endpoint, never by button taps.
     },
     trackGenreSelect: function (genreKey) {
       send({ event: 'genre_select', genre: String(genreKey).slice(0, 40) });
-    },
-    trackStop: function () {
-      send({ event: 'stop' });
     },
   };
 })();

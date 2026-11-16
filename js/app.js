@@ -13,18 +13,17 @@
 
   // ── Genre select handler ──────────────────────────────────────────────────
   Popup.onGenreSelect(function (genre) {
+    var previous = Player.getState().genre;
     Popup.setActiveKey(genre.key);
     if (window.Analytics) {
       Analytics.trackGenreSelect(genre.key);
-      Analytics.trackPlay(genre.key);
     }
-    Player.start(genre.url, genre.label);
-  });
-
-  // ── Power-off handler ─────────────────────────────────────────────────────
-  Popup.onPowerOff(function () {
-    Player.stop();
-    if (window.Analytics) Analytics.trackStop();
+    // Announce the pick first: the logo waits for this genre's playback to be confirmed.
+    // Picking the category that is already active (a resume) is not a change.
+    if (genre.key !== previous) {
+      document.dispatchEvent(new CustomEvent('24fm:genrechange', { detail: { key: genre.key, previous: previous } }));
+    }
+    Player.start(genre.url, genre.label, genre.key);
   });
 
   // ── Restore saved genre on page load ──────────────────────────────────────
@@ -55,7 +54,8 @@
       var lbl = document.getElementById('track-genre-label');
       if (lbl) lbl.textContent = found.label;
 
-      // track-info is made visible via body.has-genre CSS rule (no play needed)
+    } else {
+      CU.remove(COOKIE_GENRE);
     }
   }
 

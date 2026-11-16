@@ -8,15 +8,14 @@
   
   # Remove www for consistency
   RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-  RewriteRule ^(.*)$ https://%1$1 [R=301,L]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
   
   # Enforce HTTPS
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   
   # Protect sensitive directories
-  RewriteRule ^admin-brkloginyn/ - [F]
-  RewriteRule ^api/ - [F]
+  RewriteRule ^api/(?!live-users\.php$|track\.php$) - [F]
   RewriteRule ^data/ - [F]
 </IfModule>
 
@@ -73,7 +72,7 @@
   </FilesMatch>
   
   <FilesMatch "\.(html|htm)$">
-    Header set Cache-Control "max-age=172800, public"
+    Header set Cache-Control "no-cache"
   </FilesMatch>
   
   <FilesMatch "\.(?:ttf|ttc|otf|eot|woff|woff2)$">
@@ -90,7 +89,7 @@
 
 # Let caches keep compressed and uncompressed copies apart
 <IfModule mod_headers.c>
-  Header append Vary: Accept-Encoding
+  Header append Vary Accept-Encoding
 </IfModule>
 
 # Disable directory listing
@@ -120,3 +119,25 @@ ErrorDocument 500 /500.html
   Order allow,deny
   Allow from all
 </FilesMatch>
+
+# PHP handler from the hosting snapshot.
+<IfModule mime_module>
+  AddHandler application/x-httpd-alt-php83 .php .php8 .phtml
+</IfModule>
+<FilesMatch "^(error_log|activity-store\.php|auth\.php|stats\.php|debug-log\.php)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.php$">
+    Header unset Cache-Control
+    Header always set Cache-Control "no-store"
+    Header unset Expires
+    Header always unset Expires
+  </FilesMatch>
+</IfModule>
+<IfModule mod_expires.c>
+  <FilesMatch "\.php$">
+    ExpiresActive Off
+  </FilesMatch>
+</IfModule>

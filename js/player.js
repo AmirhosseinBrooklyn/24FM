@@ -14,375 +14,204 @@ var volIconOn    = volBtn.querySelector('.vol-icon-on');
 var volIconMuted = volBtn.querySelector('.vol-icon-muted');
 var trackGenre   = document.getElementById('track-genre-label');
 
-// ── Audio element (no crossOrigin — avoids CORS failures on Icecast streams) ──
+// Playback intent and confirmed connection state are deliberately separate.
 var audio = new Audio();
 audio.preload = 'none';
+var hls = null, playing = false, armed = false, destroying = false;
+var currentUrl = null, currentLabel = '', currentGenreKey = '', attemptId = '';
+var connectionState = 'off', generation = 0;
+var watchdogTimer = null, retryTimer = null, retryCount = 0;
+var WATCHDOG_MS = 12000, RETRY_BASE_MS = 3000, RETRY_MAX_MS = 20000, MAX_RETRIES = 4;
+var isMuted = false, prevVolume = 1;
+var savedVol = 1;
+try { var stored = Number(localStorage.getItem('24fm_volume')); if (localStorage.getItem('24fm_volume') !== null && isFinite(stored)) savedVol = Math.max(0, Math.min(1, stored)); } catch (_) {}
+audio.volume = savedVol;
+volumeSlider.value = savedVol;
+isMuted = savedVol === 0;
+prevVolume = savedVol || 1;
+volIconOn.style.display = isMuted ? 'none' : '';
+volIconMuted.style.display = isMuted ? '' : 'none';
 
-var hls        = null;
-var playing    = false;
-var armed      = false;
-var destroying = false;   // true during _destroyHls to silence spurious errors
-var currentUrl   = null;
-var currentLabel = '';
-
-var watchdogTimer = null;
-var retryTimer    = null;
-var retryCount    = 0;
-var streamStartTime = 0;
-
-var WATCHDOG_MS       = 12000;
-var RETRY_BASE_MS     = 3000;
-var RETRY_MAX_MS      = 20000;
-var MAX_RETRIES       = 4;
-var BLOCKED_THRESHOLD = 1200;  // errors within 1.2 s on first attempt = likely ad-blocked
-
-// ── Mute state ────────────────────────────────────────────────────────────
-var isMuted    = false;
-var prevVolume = 1.0;
-
-var savedVol = parseFloat(localStorage.getItem('24fm_volume'));
-audio.volume = isNaN(savedVol) ? 1.0 : savedVol;
-volumeSlider.value = audio.volume;
-
-// ── Arm positions ─────────────────────────────────────────────────────────
 toneArm.style.transition = 'none';
-toneArm.style.transform  = 'rotate(22deg)';
-requestAnimationFrame(function () {
-  requestAnimationFrame(function () { toneArm.style.transition = ''; });
-});
-
+toneArm.style.transform = 'rotate(22deg)';
+requestAnimationFrame(function () { requestAnimationFrame(function () { toneArm.style.transition = ''; }); });
 function armRest() { toneArm.style.transform = 'rotate(22deg)'; }
 function armPlay() { toneArm.style.transform = 'rotate(55deg)'; }
-
-// ── UI helpers ────────────────────────────────────────────────────────────
 function showBuffer(on) { bufferRing.classList.toggle('visible', on); }
-function showError(on)  { streamError.classList.toggle('visible', on); }
-
-function setPlayIcon(isPlaying) {
-  iconPlay.style.display  = isPlaying ? 'none' : '';
-  iconPause.style.display = isPlaying ? ''     : 'none';
-}
-
+function showError(on) { streamError.classList.toggle('visible', on); }
+function setPlayIcon(on) { iconPlay.style.display = on ? 'none' : ''; iconPause.style.display = on ? '' : 'none'; }
 function setBodyState(state) {
   document.body.classList.remove('state-off', 'state-on', 'state-paused');
   document.body.classList.add(state);
 }
-
-// ── Watchdog ──────────────────────────────────────────────────────────────
+function stateSnapshot() { return { state: connectionState, attemptId: attemptId, genre: currentGenreKey, url: currentUrl, label: currentLabel }; }
+function publishState(state) {
+  connectionState = state;
+  playing = state === 'live';
+  document.body.dataset.connection = state;
+  var label = document.getElementById('connection-status');
+  if (label) { var text = { off: 'خاموش', connecting: 'در حال اتصال', live: 'زنده' }[state]; if (label.textContent !== text) label.textContent = text; }
+  record.classList.toggle('spinning', playing);
+  showBuffer(state === 'connecting');
+  setPlayIcon(armed);
+  if (state === 'off') armRest(); else armPlay();
+  document.dispatchEvent(new CustomEvent('24fm:statechange', { detail: stateSnapshot() }));
+}
+function genreKey(url, label, key) {
+  if (key) return key;
+  var genres = window.Popup ? Popup.getGenres() : [];
+  var match = genres.find(function (g) { return g.url === url && g.label === label; }) || genres.find(function (g) { return g.url === url; });
+  return match ? match.key : '';
+}
+function clearWatchdog() { clearTimeout(watchdogTimer); watchdogTimer = null; }
+function resetRetry() { retryCount = 0; clearWatchdog(); clearTimeout(retryTimer); retryTimer = null; }
 function startWatchdog() {
-  clearTimeout(watchdogTimer);
-  watchdogTimer = setTimeout(function () {
-    if (armed && currentUrl && !playing) retryStream();
-  }, WATCHDOG_MS);
+  clearWatchdog();
+  // The Android service owns its retry budget, including background playback.
+  if (window.__fm24BridgeInstalled) return;
+  watchdogTimer = setTimeout(function () { if (armed && !playing) retryStream(); }, WATCHDOG_MS);
 }
-
-function clearWatchdog() {
-  clearTimeout(watchdogTimer);
-  watchdogTimer = null;
+function _destroyHls() {
+  var stamp = ++generation;
+  destroying = true;
+  if (hls) { hls.destroy(); hls = null; }
+  audio.pause(); audio.removeAttribute('src'); audio.load();
+  setTimeout(function () { if (stamp === generation) destroying = false; }, 100);
 }
-
-// ── Retry logic ───────────────────────────────────────────────────────────
+function failPlayback() {
+  armed = false;
+  resetRetry(); _destroyHls(); showError(true); setBodyState('state-paused'); publishState('off');
+}
 function retryStream() {
-  clearWatchdog();
-  clearTimeout(retryTimer);
-  if (!armed || !currentUrl) return;
-  if (playing) return;                        // already recovered — don't interrupt
-  if (retryCount >= MAX_RETRIES) {
-    showBuffer(false);
-    showError(true);
-    return;
-  }
+  clearWatchdog(); clearTimeout(retryTimer);
+  if (!armed || !currentUrl || playing) return;
+  if (retryCount >= MAX_RETRIES) { failPlayback(); return; }
   retryCount++;
-  showBuffer(true);
+  publishState('connecting');
   showError(false);
-  var delay = Math.min(RETRY_BASE_MS * retryCount, RETRY_MAX_MS);
+  var stamp = generation;
   retryTimer = setTimeout(function () {
-    if (armed && currentUrl && !playing) _loadStream(currentUrl);
-  }, delay);
+    if (armed && !playing && stamp === generation) _loadStream(currentUrl);
+  }, Math.min(RETRY_BASE_MS * retryCount, RETRY_MAX_MS));
 }
-
-function resetRetry() {
-  retryCount = 0;
-  clearTimeout(retryTimer);
-  retryTimer = null;
-  clearWatchdog();
+function isHLSUrl(url) { return /\.m3u8(\?|$)/i.test(url); }
+function _loadStream(url) {
+  _destroyHls();
+  var stamp = generation;
+  showError(false); publishState('connecting'); startWatchdog();
+  function current() { return armed && stamp === generation; }
+  function play() {
+    if (!current()) return;
+    var promise = audio.play();
+    if (promise && promise.catch) promise.catch(function (err) {
+      if (!current() || err.name === 'AbortError') return;
+      if (err.name === 'NotAllowedError' || window.__fm24BridgeInstalled) failPlayback();
+      else retryStream();
+    });
+  }
+  if (isHLSUrl(url) && typeof Hls !== 'undefined' && Hls.isSupported()) {
+    var instance = new Hls({ enableWorker: true, backBufferLength: 0, maxBufferLength: 20,
+      maxMaxBufferLength: 60, liveSyncDurationCount: 3, liveMaxLatencyDurationCount: 10,
+      fragLoadingTimeOut: 10000, manifestLoadingTimeOut: 10000, levelLoadingTimeOut: 10000,
+      fragLoadingMaxRetry: 3, manifestLoadingMaxRetry: 3, levelLoadingMaxRetry: 3,
+      xhrSetup: function (xhr) { xhr.withCredentials = false; } });
+    hls = instance;
+    instance.on(Hls.Events.MANIFEST_PARSED, play);
+    instance.on(Hls.Events.ERROR, function (_, data) {
+      if (!current() || !data.fatal) return;
+      publishState('connecting');
+      if (data.type === Hls.ErrorTypes.MEDIA_ERROR && retryCount < MAX_RETRIES) {
+        retryCount++; instance.recoverMediaError(); startWatchdog();
+      } else retryStream();
+    });
+    instance.loadSource(url); instance.attachMedia(audio);
+  } else if (!isHLSUrl(url) || audio.canPlayType('application/vnd.apple.mpegurl')) {
+    audio.src = url; play();
+  } else failPlayback();
 }
+audio.addEventListener('playing', function () {
+  if (!armed || (!window.__fm24BridgeInstalled && audio.readyState < 2)) return;
+  resetRetry(); showError(false); publishState('live');
+});
+function buffering() { if (armed) { publishState('connecting'); startWatchdog(); } }
+audio.addEventListener('waiting', buffering);
+audio.addEventListener('stalled', function () { if (audio.readyState < 3 || window.__fm24BridgeInstalled) buffering(); });
+audio.addEventListener('pause', function () {
+  if (!destroying && armed && !window.__fm24BridgeInstalled) pausePlayback();
+});
+audio.addEventListener('error', function () {
+  if (destroying || !armed) return;
+  publishState('connecting');
+  if (window.__fm24BridgeInstalled) failPlayback(); else retryStream();
+});
+audio.addEventListener('ended', function () { if (armed) { publishState('connecting'); retryStream(); } });
+function startPlayback(url, label, key) {
+  if (!url) return;
+  var reuse = armed && playing && currentUrl === url;
+  currentUrl = url; currentLabel = label || ''; currentGenreKey = genreKey(url, label, key);
+  if (trackGenre) trackGenre.textContent = currentLabel;
+  document.body.classList.add('has-genre');
+  if (reuse) {
+    if (window.__fm24BridgeInstalled) { audio.src = url; audio.play().catch(function () {}); }
+    publishState('live'); swapCD(); return;
+  }
+  resetRetry(); armed = true;
+  attemptId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+  setBodyState('state-on');
+  _loadStream(url); swapCD();
+}
+function pausePlayback(external) {
+  armed = false; resetRetry();
+  if (external === true && window.__fm24BridgeInstalled) generation++; else _destroyHls();
+  showError(false);
+  setBodyState('state-paused'); publishState('off');
+}
+function togglePlayPause() {
+  if (!currentUrl) { if (window.Popup) Popup.open(); return; }
+  if (armed) pausePlayback(); else startPlayback(currentUrl, currentLabel, currentGenreKey);
+}
+btnPlay.addEventListener('click', togglePlayPause);
+record.addEventListener('click', togglePlayPause);
 
 // ── CD swap animation ─────────────────────────────────────────────────────
 var cdSwapLocked = false;
+var cdSwapGeneration = 0;
 
 function swapCD() {
   if (cdSwapLocked) return;
   cdSwapLocked = true;
+  var stamp = ++cdSwapGeneration;
+  var fallback;
   // Keep the page-entry animation from restarting when the swap classes are removed.
   cdWrap.style.animation = 'none';
   cdWrap.classList.remove('sliding-in', 'sliding-out');
   void cdWrap.offsetWidth;
   cdWrap.classList.add('sliding-out');
 
-  function onOut() {
+  function finish() {
+    if (stamp !== cdSwapGeneration) return;
+    clearTimeout(fallback);
+    cdWrap.removeEventListener('animationend', onOut);
+    cdWrap.removeEventListener('animationend', onIn);
+    cdWrap.classList.remove('sliding-out', 'sliding-in');
+    cdSwapLocked = false;
+  }
+  function onIn(event) {
+    if (event.target === cdWrap && event.animationName === 'cd-in') finish();
+  }
+  function onOut(event) {
+    if (stamp !== cdSwapGeneration || event.target !== cdWrap || event.animationName !== 'cd-out') return;
     cdWrap.removeEventListener('animationend', onOut);
     cdWrap.classList.remove('sliding-out');
     void cdWrap.offsetWidth;
     cdWrap.classList.add('sliding-in');
-    cdWrap.addEventListener('animationend', function onIn() {
-      cdWrap.removeEventListener('animationend', onIn);
-      cdWrap.classList.remove('sliding-in');
-      cdSwapLocked = false;
-    });
+    cdWrap.addEventListener('animationend', onIn);
   }
 
   cdWrap.addEventListener('animationend', onOut);
-  setTimeout(function () {
-    if (cdSwapLocked) {
-      cdWrap.classList.remove('sliding-out', 'sliding-in');
-      cdSwapLocked = false;
-    }
-  }, 2000);
+  fallback = setTimeout(finish, 2000);
 }
 
-// ── Stream helpers ────────────────────────────────────────────────────────
-function isHLSUrl(url) {
-  return /\.m3u8(\?|$)/i.test(url);
-}
-
-function _destroyHls() {
-  destroying = true;
-  if (hls) { hls.destroy(); hls = null; }
-  audio.pause();
-  audio.removeAttribute('src');
-  audio.load();
-  // Clear flag async — audio.load() can dispatch events after the current stack
-  setTimeout(function () { destroying = false; }, 100);
-}
-
-// ── Core stream loader ────────────────────────────────────────────────────
-function _loadStream(url) {
-  _destroyHls();
-  streamStartTime = Date.now();
-  showError(false);
-  showBuffer(true);
-  startWatchdog();
-
-  if (isHLSUrl(url)) {
-    // ── HLS ──────────────────────────────────────────────────────────────
-    if (typeof Hls === 'undefined' || !Hls.isSupported()) {
-      if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-        audio.src = url;
-        audio.play().catch(function () { showBuffer(false); showError(true); clearWatchdog(); });
-      } else {
-        showBuffer(false); showError(true); clearWatchdog();
-      }
-      return;
-    }
-
-    hls = new Hls({
-      enableWorker:                true,
-      lowLatencyMode:              false,
-      backBufferLength:            0,
-      maxBufferLength:             20,
-      maxMaxBufferLength:          60,
-      liveSyncDurationCount:       3,
-      liveMaxLatencyDurationCount: 10,
-      fragLoadingTimeOut:          10000,
-      manifestLoadingTimeOut:      10000,
-      levelLoadingTimeOut:         10000,
-      fragLoadingMaxRetry:         3,
-      manifestLoadingMaxRetry:     3,
-      levelLoadingMaxRetry:        3,
-      startFragPrefetch:           true,
-      testBandwidth:               false,
-      xhrSetup: function (xhr) { xhr.withCredentials = false; },
-    });
-
-    hls.loadSource(url);
-    hls.attachMedia(audio);
-
-    var manifestFired = false;
-    hls.on(Hls.Events.MANIFEST_PARSED, function () {
-      if (manifestFired) return;   // guard against duplicate fires
-      manifestFired = true;
-      var p = audio.play();
-      if (p !== undefined) {
-        p.catch(function (err) {
-          if (err.name === 'NotAllowedError') {
-            showBuffer(false);
-            setPlayIcon(false);
-            playing = false;
-            document.addEventListener('click', function resume() {
-              document.removeEventListener('click', resume);
-              if (armed && hls) audio.play().catch(function () {});
-            }, { once: true });
-          }
-        });
-      }
-    });
-
-    hls.on(Hls.Events.ERROR, function (evt, data) {
-      if (!data.fatal) return;
-      var elapsed = Date.now() - streamStartTime;
-      if (elapsed < BLOCKED_THRESHOLD && retryCount === 0) {
-        // Immediate failure on first attempt → likely blocked by ad-blocker
-        clearWatchdog();
-        showBuffer(false);
-        showError(true);
-        return;
-      }
-      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        hls.recoverMediaError();
-      } else {
-        retryStream();
-      }
-    });
-
-  } else {
-    // ── Direct MP3 / Icecast stream ───────────────────────────────────────
-    audio.src = url;
-    var p = audio.play();
-    if (p !== undefined) {
-      p.catch(function (err) {
-        if (err.name === 'NotAllowedError') {
-          showBuffer(false);
-          setPlayIcon(false);
-          playing = false;
-          document.addEventListener('click', function resume() {
-            document.removeEventListener('click', resume);
-            if (armed) audio.play().catch(function () {});
-          }, { once: true });
-        } else {
-          var elapsed = Date.now() - streamStartTime;
-          if (elapsed < BLOCKED_THRESHOLD && retryCount === 0) {
-            clearWatchdog();
-            showBuffer(false);
-            showError(true);
-          } else {
-            retryStream();
-          }
-        }
-      });
-    }
-  }
-}
-
-// ── Audio events ──────────────────────────────────────────────────────────
-audio.addEventListener('playing', function () {
-  clearWatchdog();
-  resetRetry();
-  showBuffer(false);
-  showError(false);
-  record.classList.add('spinning');
-  playing = true;
-  setPlayIcon(true);
-});
-
-// Only react to buffering events when we are actively supposed to be playing
-audio.addEventListener('waiting', function () {
-  if (!armed) return;
-  showBuffer(true);
-  startWatchdog();
-});
-
-audio.addEventListener('stalled', function () {
-  if (!armed) return;
-  showBuffer(true);
-  startWatchdog();
-});
-
-audio.addEventListener('canplay', function () {
-  clearWatchdog();
-});
-
-audio.addEventListener('pause', function () {
-  // Only tidy up the spinner if playback was not intentional
-  if (!playing) record.classList.remove('spinning');
-});
-
-audio.addEventListener('error', function () {
-  if (destroying) return;   // ignore cleanup noise from _destroyHls
-  if (!armed) return;
-  var elapsed = Date.now() - streamStartTime;
-  showBuffer(false);
-  if (elapsed < BLOCKED_THRESHOLD && retryCount === 0) {
-    clearWatchdog();
-    showError(true);
-  } else {
-    retryStream();
-  }
-});
-
-// ── Playback control ──────────────────────────────────────────────────────
-function startPlayback(url, genreLabel) {
-  if (!url) return;
-
-  armed        = true;
-  currentUrl   = url;
-  currentLabel = genreLabel || '';
-
-  setPlayIcon(true);
-  showError(false);
-  armPlay();
-
-  if (trackGenre && genreLabel) trackGenre.textContent = genreLabel;
-
-  document.body.classList.add('has-genre');
-  record.classList.remove('spinning');
-  setBodyState('state-on');
-
-  _loadStream(url);
-  swapCD();
-}
-
-function stopPlayback() {
-  armed   = false;
-  playing = false;
-  resetRetry();
-  _destroyHls();
-
-  setPlayIcon(false);
-  showBuffer(false);
-  showError(false);
-  record.classList.remove('spinning');
-  armRest();
-
-  currentUrl   = null;
-  currentLabel = '';
-  document.body.classList.remove('has-genre');
-  setBodyState('state-off');
-}
-
-function togglePlayPause() {
-  if (!currentUrl) {
-    if (window.Popup) window.Popup.open();
-    return;
-  }
-
-  if (playing) {
-    // ── PAUSE ──────────────────────────────────────────────────────────────
-    // Set flags first so async events fired by _destroyHls are ignored
-    playing = false;
-    armed   = false;
-    clearWatchdog();
-    clearTimeout(retryTimer);
-
-    // Fully tear down HLS + audio so no background loading can trigger
-    // the watchdog or auto-resume
-    _destroyHls();
-
-    setPlayIcon(false);
-    showBuffer(false);
-    showError(false);
-    record.classList.remove('spinning');
-    armRest();
-    setBodyState('state-paused');
-
-  } else {
-    // ── RESUME ─────────────────────────────────────────────────────────────
-    startPlayback(currentUrl, currentLabel);
-  }
-}
-
-btnPlay.addEventListener('click', function () { togglePlayPause(); });
-record.addEventListener('click',  function () { togglePlayPause(); });
 
 // ── Volume & mute ─────────────────────────────────────────────────────────
 volumeSlider.addEventListener('input', function (e) {
@@ -420,15 +249,14 @@ volBtn.addEventListener('click', function () {
   try { localStorage.setItem('24fm_volume', String(audio.volume)); } catch (_) {}
 });
 
-// ── Public API ────────────────────────────────────────────────────────────
+
 window.Player = {
-  start: startPlayback,
-  stop:  stopPlayback,
-  setCurrentUrl: function (url, label) {
-    currentUrl   = url;
-    currentLabel = label || '';
-    armed        = !!url;
+  start: startPlayback, pause: pausePlayback,
+  setCurrentUrl: function (url, label, key) {
+    currentUrl = url; currentLabel = label || ''; currentGenreKey = genreKey(url, label, key);
     if (url) document.body.classList.add('has-genre');
+    if (trackGenre && label) trackGenre.textContent = label;
   },
-  isPlaying: function () { return playing; },
+  isPlaying: function () { return playing; }, getState: stateSnapshot,
 };
+publishState('off');

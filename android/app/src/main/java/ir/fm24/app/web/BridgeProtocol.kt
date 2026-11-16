@@ -8,7 +8,7 @@ sealed interface BridgeMessage {
     /** Script is ready and wants the current native playback state. */
     data object Hello : BridgeMessage
 
-    data class Play(val url: String, val label: String) : BridgeMessage
+    data class Play(val url: String, val label: String, val genreKey: String = "") : BridgeMessage
     data object Pause : BridgeMessage
 
     /** The site's power-off button: stop and dismiss the media notification. */
@@ -43,7 +43,8 @@ object BridgeProtocol {
             "play" -> {
                 val url = json.optString("url").trim()
                 if (!UrlPolicy.isAcceptableStreamUrl(url)) return null
-                BridgeMessage.Play(url, sanitizeLabel(json.optString("label")))
+                BridgeMessage.Play(url, sanitizeLabel(json.optString("label")),
+                    json.optString("genreKey").takeIf { it.matches(Regex("[a-z0-9-]{0,40}")) }.orEmpty())
             }
             "pause" -> BridgeMessage.Pause
             "stop" -> BridgeMessage.Stop

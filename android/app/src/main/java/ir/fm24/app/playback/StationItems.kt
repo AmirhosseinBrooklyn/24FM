@@ -3,6 +3,7 @@ package ir.fm24.app.playback
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -12,7 +13,7 @@ import ir.fm24.app.R
 import ir.fm24.app.web.UrlPolicy
 
 /** A 24FM station as chosen on the website. */
-data class Station(val url: String, val label: String)
+data class Station(val url: String, val label: String, val genreKey: String = "")
 
 /** Builds playable media items and remembers the last station for playback resumption. */
 class StationItems(private val context: Context) {
@@ -35,7 +36,8 @@ class StationItems(private val context: Context) {
                     .setMediaUri(station.url.toUri())
                     .build(),
             )
-            .setMediaMetadata(MediaMetadata.Builder().setStation(station.label).build())
+            .setMediaMetadata(MediaMetadata.Builder().setStation(station.label)
+                .setExtras(Bundle().apply { putString("24fm_genre", station.genreKey) }).build())
             .build()
 
     /** Full item resolved inside the service, or null when the URL is not acceptable. */
@@ -46,7 +48,7 @@ class StationItems(private val context: Context) {
         if (!UrlPolicy.isAcceptableStreamUrl(url)) return null
         val label = requested.mediaMetadata.station?.toString()?.takeIf { it.isNotBlank() }
             ?: context.getString(R.string.playback_default_genre)
-        return build(Station(url, label))
+        return build(Station(url, label, requested.mediaMetadata.extras?.getString("24fm_genre").orEmpty()))
     }
 
     fun build(station: Station): MediaItem {
@@ -58,6 +60,7 @@ class StationItems(private val context: Context) {
             .setMediaMetadata(
                 MediaMetadata.Builder()
                     .setStation(station.label)
+                    .setExtras(Bundle().apply { putString("24fm_genre", station.genreKey) })
                     .setAlbumTitle(context.getString(R.string.station_name))
                     .setArtworkUri(artworkUri)
                     .setIsPlayable(true)
@@ -72,13 +75,14 @@ class StationItems(private val context: Context) {
         prefs.edit {
             putString(KEY_URL, station.url)
             putString(KEY_LABEL, station.label)
+            putString("last_genre", station.genreKey)
         }
     }
 
     fun lastStation(): Station? {
         val url = prefs.getString(KEY_URL, null) ?: return null
         if (!UrlPolicy.isAcceptableStreamUrl(url)) return null
-        return Station(url, prefs.getString(KEY_LABEL, null).orEmpty())
+        return Station(url, prefs.getString(KEY_LABEL, null).orEmpty(), prefs.getString("last_genre", null).orEmpty())
     }
 
     private companion object {

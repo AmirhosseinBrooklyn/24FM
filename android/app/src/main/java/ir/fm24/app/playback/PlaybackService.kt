@@ -47,6 +47,7 @@ class PlaybackService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
     private lateinit var exo: ExoPlayer
     private lateinit var player: LiveStreamPlayer
+    private lateinit var activityReporter: ActivityReporter
     private lateinit var stations: StationItems
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -57,6 +58,7 @@ class PlaybackService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
+        activityReporter = ActivityReporter()
         stations = StationItems(this)
 
         val httpFactory = DefaultHttpDataSource.Factory()
@@ -85,7 +87,7 @@ class PlaybackService : MediaSessionService() {
         exo.addListener(ExoListener())
 
         player = LiveStreamPlayer(exo, getString(R.string.station_name) + " · " + getString(R.string.playback_live))
-        player.onUserIntentChanged = { cancelRetry(); reconnect.reset() }
+        player.onUserIntentChanged = { wants -> activityReporter.userIntent(wants); cancelRetry(); reconnect.reset() }
 
         setMediaNotificationProvider(
             DefaultMediaNotificationProvider.Builder(this)
@@ -112,6 +114,7 @@ class PlaybackService : MediaSessionService() {
     }
 
     override fun onDestroy() {
+        activityReporter.close()
         scope.cancel()
         cancelRetry()
         mediaSession?.run {
@@ -191,6 +194,13 @@ class PlaybackService : MediaSessionService() {
     }
 
     private inner class ExoListener : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            val item = exo.currentMediaItem
+            activityReporter.update(exo.isPlaying, item?.mediaId.orEmpty(),
+                item?.mediaMetadata?.station?.toString().orEmpty(),
+                item?.mediaMetadata?.extras?.getString("24fm_genre").orEmpty())
+        }
+
         override fun onPlayerError(error: PlaybackException) {
             if (BuildConfig.DEBUG) Log.w(TAG, "Stream error ${error.errorCodeName}", error)
             onStreamError(error)
@@ -218,7 +228,7 @@ class PlaybackService : MediaSessionService() {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             val item = mediaItem ?: return
             val url = item.localConfiguration?.uri?.toString() ?: return
-            stations.remember(Station(url, item.mediaMetadata.station?.toString().orEmpty()))
+            stations.remember(Station(url, item.mediaMetadata.station?.toString().orEmpty(), item.mediaMetadata.extras?.getString("24fm_genre").orEmpty()))
         }
     }
 

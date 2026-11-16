@@ -46,7 +46,8 @@
   <link rel="icon" href="favicon.ico" sizes="48x48">
   <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20261116.2">
+  <script src="js/brand.js?v=20261116.2"></script>
   
   <!-- JSON-LD Schema Markup -->
   <script type="application/ld+json">
@@ -100,7 +101,7 @@
   }
   </script>
 </head>
-<body class="state-off">
+<body class="state-off" data-connection="off">
 
   <!-- Noise overlay for texture -->
   <div class="noise-overlay" aria-hidden="true"></div>
@@ -110,7 +111,7 @@
 
     <!-- Hero / Brand -->
     <header class="hero">
-      <div class="brand-name">24FM</div>
+      <span class="brand-name fluo is-off" data-text="24FM">24FM</span>
       <p class="brand-tagline">موسیقی بی‌وقفه، به سبک خودت</p>
     </header>
 
@@ -119,9 +120,9 @@
 
       <!-- CD Track info display -->
       <div class="track-info" id="track-info">
-        <span class="track-genre" id="track-genre-label">سبک انتخابی</span>
-        <span class="track-dot">●</span>
-        <span class="track-live">زنده</span>
+        <span class="track-genre" id="track-genre-label">سبکی انتخاب نشده</span>
+        <span class="track-dot" aria-hidden="true">●</span>
+        <span class="track-live" id="connection-status" role="status">خاموش</span>
       </div>
 
       <!-- Gramophone unit -->
@@ -200,6 +201,11 @@
 
       </div><!-- /gramophone -->
 
+      <div class="listener-count" id="listener-count" role="status" aria-live="polite">
+        <span class="listener-orb" aria-hidden="true"></span>
+        <span>شنونده آنلاین رادیو: <b id="listener-count-value">۰</b> نفر</span>
+      </div>
+
       <!-- Error message -->
       <div class="stream-error" id="stream-error" aria-live="polite">
         خطا در اتصال به استریم | لطفاً دوباره تلاش کنید
@@ -228,26 +234,23 @@
       </div>
       <!-- Language selector / tabs — populated dynamically by popup.js -->
       <div class="popup-lang-bar" id="popup-lang-bar"></div>
+      <div class="genre-search-wrap" id="genre-search-wrap" hidden>
+        <label for="genre-search">جستجوی سبک</label>
+        <input type="search" id="genre-search" placeholder="نام سبک را بنویسید" autocomplete="off" aria-controls="genre-grid">
+        <button type="button" id="genre-search-clear" aria-label="پاک کردن جستجو">×</button>
+      </div>
       <div class="genre-grid" id="genre-grid">
         <!-- Genres injected by popup.js -->
-      </div>
-      <div class="popup-poweroff">
-        <button class="btn-poweroff" id="btn-poweroff" aria-label="خاموش کردن">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
-            <line x1="12" y1="2" x2="12" y2="12"/>
-          </svg>
-          Power Off
-        </button>
       </div>
     </div>
   </div>
 
   <!-- Scripts -->
   <script src="assets/hls.min.js"></script>
-  <script src="js/popup.js"></script>
-  <script src="js/player.js"></script>
-  <script src="js/analytics.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/popup.js?v=20261116.2"></script>
+  <script src="js/player.js?v=20261116.2"></script>
+  <script src="js/analytics.js?v=20261116.2"></script>
+  <script src="js/activity.js?v=20261116.2"></script>
+  <script src="js/app.js?v=20261116.2"></script>
 </body>
 </html>

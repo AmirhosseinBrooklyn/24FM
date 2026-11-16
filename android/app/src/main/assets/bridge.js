@@ -12,6 +12,7 @@
   var native = window.FM24Native;
   if (!native || window.__fm24BridgeInstalled) return;
   window.__fm24BridgeInstalled = true;
+  window.__fm24PresenceOwnedNatively = true;
 
   function send(msg) {
     try { native.postMessage(JSON.stringify(msg)); } catch (e) { /* bridge unavailable */ }
@@ -99,7 +100,7 @@
   NativeAudio.prototype.play = function () {
     if (pendingPause) { clearTimeout(pendingPause); pendingPause = null; }
     if (!this._src) return Promise.resolve();
-    send({ t: 'play', url: this._src, label: currentLabel() });
+    send({ t: 'play', url: this._src, label: currentLabel(), genreKey: window.Player && Player.getState ? Player.getState().genre : '' });
     return Promise.resolve();
   };
 
@@ -120,10 +121,11 @@
     if (btn) btn.click();
   }
 
-  function findGenreKey(url) {
+  function findGenreKey(url, label) {
     try {
       var genres = window.Popup && window.Popup.getGenres ? window.Popup.getGenres() : [];
-      for (var i = 0; i < genres.length; i++) if (genres[i].url === url) return genres[i].key;
+      for (var i = 0; i < genres.length; i++) if (genres[i].url === url && genres[i].label === label) return genres[i].key;
+      for (var j = 0; j < genres.length; j++) if (genres[j].url === url) return genres[j].key;
     } catch (e) { /* ignore */ }
     return null;
   }
@@ -143,9 +145,10 @@
           element._emit('playing');
         } else if (player && nativeUrl) {
           // Started from the notification, a headset or before a page reload: reflect it.
-          var key = findGenreKey(nativeUrl);
+          var key = findGenreKey(nativeUrl, nativeLabel);
           if (key && window.Popup && window.Popup.setActiveKey) window.Popup.setActiveKey(key);
           player.start(nativeUrl, nativeLabel || '');
+          element._emit('playing'); // This message already confirms actual native playback.
         }
         break;
       case 'buffering':
@@ -155,8 +158,7 @@
       case 'idle':
         if (bodyHas('state-on') && player) {
           // Paused natively (notification, headset, audio focus): run the page's own pause.
-          if (!player.isPlaying()) element._emit('playing');
-          clickPlayButton();
+          if (player.pause) player.pause(true); else clickPlayButton();
         } else if (previous !== nativeState) {
           element._emit('pause');
         }
